@@ -26,11 +26,11 @@ var server = http.createServer(function(req, res) {
       if (validator.isEmail(email)) {
         console.log(email);
         res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('ok');
+        res.end('Merci pour votre inscription !');
       } else {
         console.log('not good')
-        res.writeHead(400, {'Content-Type': 'text/plain'});
-        res.end('nok');
+        res.writeHead(500, {'Content-Type': 'text/plain'});
+        res.end("Malheureusement nous n'avons pas pu enregistrer votre email.");
       }
     });
   } else {

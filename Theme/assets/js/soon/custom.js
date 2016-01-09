@@ -48,6 +48,31 @@ COMMING SOON PAGE
     }
 })(jQuery);
 /******************************************************************************************************************************
+FORM HANDLING
+*******************************************************************************************************************************/
+$(document).ready(function() {
+    $('#emailForm').on('submit', function(e) {
+        e.preventDefault();
+        var $this = $(this);
+        var mail = $('#email').val();
+        if (mail === '') {
+            alert('Renseignez votre email');
+        } else {
+            $.ajax({
+                url: $this.attr('action'),
+                type: $this.attr('method'),
+                data: $this.serialize(),
+                success: function(html) {
+                    alert(html);
+                },
+                error: function(e, status) {
+                    alert("Impossible d'enregistrer cet email.");
+                }
+            });
+        }
+    });
+});
+/******************************************************************************************************************************
 ANIMATIONS
 *******************************************************************************************************************************/
 (function($) {
@@ -132,25 +157,3 @@ PROGRESS BAR
         $('#bar-container').slideToggle(); 
     });
 })(jQuery);
-/******************************************************************************************************************************
-FORM HANDLING
-*******************************************************************************************************************************/
-$(document).ready(function() {
-    $('#emailForm').on('submit', function(e) {
-        e.preventDefault();
-        var $this = $(this);
-        var mail = $('#email').val();
-        if (mail === '') {
-            alert('Renseignez votre email');
-        } else {
-            $.ajax({
-                url: $this.attr('action'),
-                type: $this.attr('method'),
-                data: $this.serialize(),
-                success: function(html) {
-                    alert(html);
-                }
-            });
-        }
-    });
-});
