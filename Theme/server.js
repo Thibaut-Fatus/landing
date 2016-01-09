@@ -4,6 +4,7 @@ var serveStatic = require('serve-static');
 var validator = require('validator');
 var qs = require('querystring');
 var nodemailer = require('nodemailer');
+var gmailPasswd = process.env.GMAIL_SUBSCRIBE_PWD
 
 
 var serve = serveStatic("./");
@@ -40,12 +41,11 @@ var server = http.createServer(function(req, res) {
 });
 
 var sendMail = function(email) {
-    console.log(email);
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
             user: 'subscribe@weassur.com',
-            pass: 'We*As*Su'
+            pass: gmailPasswd
         }
     });
     var mailOptions = {
@@ -57,9 +57,10 @@ var sendMail = function(email) {
     };
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {
+            console.log('ERROR : ' + email);
             console.log(error);
         } else {
-            console.log('Message sent: ' + info.response);
+            console.log('Message sent: ' + email);
         };
     });
 };
