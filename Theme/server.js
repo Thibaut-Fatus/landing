@@ -1,10 +1,12 @@
 var http = require('http');
+var fs = require('fs');
 var finalhandler = require('finalhandler');
 var serveStatic = require('serve-static');
 var validator = require('validator');
 var qs = require('querystring');
 var nodemailer = require('nodemailer');
 var gmailPasswd = process.env.GMAIL_SUBSCRIBE_PWD
+var mailsFile = __dirname + "/emails.csv"
 
 
 var serve = serveStatic(__dirname);
@@ -28,7 +30,7 @@ var server = http.createServer(function(req, res) {
             if (validator.isEmail(email)) {
                 res.writeHead(200, {'Content-Type': 'text/plain'});
                 res.end('Merci pour votre inscription !');
-                sendMail(email);
+                handleMail(email);
             } else {
                 res.writeHead(500, {'Content-Type': 'text/plain'});
                 res.end("Malheureusement nous n'avons pas pu enregistrer votre email.");
@@ -39,6 +41,19 @@ var server = http.createServer(function(req, res) {
         serve(req, res, done);
     }
 });
+
+var handleMail = function(email) {
+    sendMail(email);
+    writeMail(email);
+};
+
+var writeMail = function(email) {
+    fs.appendFile(mailsFile, email + "\n", function (err) {
+        if (err) {
+            console.log("unable to write mail ! " + email);
+        }
+    });
+};
 
 var sendMail = function(email) {
     var transporter = nodemailer.createTransport({
