@@ -15,19 +15,24 @@ var server = http.createServer(function(req, res) {
       body += data;
 
       // Too much POST data, kill the connection!
-      // 1e6 === 1 * Math.pow(10, 6) === 1 * 1000000 ~~~ 1MB
-      if (body.length > 1e6)
+      // 1e4 ~~~ 10kB
+      if (body.length > 1e4)
         req.connection.destroy();
     });
 
     req.on('end', function () {
       var post = qs.parse(body);
-      var email = post["email"]
+      var email = post['email']
       if (validator.isEmail(email)) {
         console.log(email);
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.end('ok');
+      } else {
+        console.log('not good')
+        res.writeHead(400, {'Content-Type': 'text/plain'});
+        res.end('nok');
       }
     });
-    res.end();
   } else {
     var done = finalhandler(req, res);
     serve(req, res, done);
