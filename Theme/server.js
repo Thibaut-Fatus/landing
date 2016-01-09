@@ -7,7 +7,7 @@ var nodemailer = require('nodemailer');
 var gmailPasswd = process.env.GMAIL_SUBSCRIBE_PWD
 
 
-var serve = serveStatic("./");
+var serve = serveStatic(__dirname);
 
 var server = http.createServer(function(req, res) {
     if (req.method === "POST") {
