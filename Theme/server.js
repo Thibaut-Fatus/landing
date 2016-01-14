@@ -78,6 +78,21 @@ var sendMail = function(email) {
             console.log('Message sent: ' + email);
         };
     });
+    var mailFounders = {
+        from: 'subscribe@weassur.com',
+        to: "founders@weassur.com",
+        subject: 'Nouvel inscrit !',
+        //text: text //, // plaintext body
+        html: email
+    };
+    transporter.sendMail(mailFounders, function(error, info) {
+        if (error) {
+            console.log('ERROR mail founders: ' + email);
+            console.log(error);
+        } else {
+            console.log('Message sent to founders : ' + email);
+        };
+    });
 };
 
 server.listen(8888);
