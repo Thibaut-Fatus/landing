@@ -56,15 +56,16 @@ var writeMail = function(email) {
 };
 
 var sendMail = function(email) {
+    console.log(gmailPasswd);
     var transporter = nodemailer.createTransport({
         service: 'Gmail',
         auth: {
-            user: 'subscribe@weassur.com',
+            user: 'thibaut@weassur.com',
             pass: gmailPasswd
         }
     });
     var mailOptions = {
-        from: 'subscribe@weassur.com',
+        from: 'thibaut@weassur.com',
         to: email,
         subject: 'Merci pour votre inscription !',
         //text: text //, // plaintext body
@@ -79,7 +80,7 @@ var sendMail = function(email) {
         };
     });
     var mailFounders = {
-        from: 'subscribe@weassur.com',
+        from: 'thibaut@weassur.com',
         to: "founders@weassur.com",
         subject: 'Nouvel inscrit !',
         //text: text //, // plaintext body
