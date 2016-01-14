@@ -5,6 +5,8 @@ var serveStatic = require('serve-static');
 var validator = require('validator');
 var qs = require('querystring');
 var nodemailer = require('nodemailer');
+var googleapis = require('googleapis');
+
 var gmailPasswd = process.env.GMAIL_SUBSCRIBE_PWD
 var mailsFile = __dirname + "/emails.csv"
 
@@ -43,15 +45,72 @@ var server = http.createServer(function(req, res) {
 });
 
 var handleMail = function(email) {
-    sendMail(email);
-    writeMail(email);
+    authenticate(email)
 };
 
-var writeMail = function(email) {
-    fs.appendFile(mailsFile, email + "\n", function (err) {
+var authenticate = function(email) {
+    var key = require('/home/thibaut/dev/wa/landing/Theme/landing.json')
+    var SCOPES = [
+          "https://www.googleapis.com/auth/gmail.compose"
+//          "https://www.googleapis.com/auth/gmail.send",
+//          "https://www.googleapis.com/auth/gmail.insert",
+//          "https://www.googleapis.com/auth/gmail.readonly",
+//          "https://www.googleapis.com/auth/gmail.modify"
+          //"https://mail.google.com/"
+    ]
+    client = new googleapis.auth.JWT(
+          /*
+           *
+           *
+           *   ON PEUT PAS UTILISER JWT AVEC GMAIL !
+           *   IL FAUT PASSER EN OAUTH
+           *
+           *
+           *
+           */
+          key.client_email,
+          null /* path to private_key.pem */,
+          key.private_key,
+          SCOPES,
+//          "subscribe@landing-1190.iam.gserviceaccount.com");
+          "thibaut@weassur.com");
+    client.authorize(function(err, tokens) {
         if (err) {
-            console.log("unable to write mail ! " + email);
+            console.log(err);
+            return;
+        } else {
+            sendMail2(email, client);
+            writeMail(email);
         }
+    })
+};
+
+var sendMail2 = function(email, client) {
+    console.log("entering")
+    var gmail = googleapis.gmail({version: 'v1', auth: client})
+    console.log("authorized");
+
+    var email_lines = [];
+
+    email_lines.push("From: \"Thibaut\" <thibaut@weassur.com>");
+    email_lines.push("To: thibaut@weassur.com");
+    email_lines.push('Content-type: text/html;charset=iso-8859-1');
+    email_lines.push('MIME-Version: 1.0');
+    email_lines.push("Subject: Nice");
+    email_lines.push("");
+    email_lines.push("ca");
+    email_lines.push("<b>marche</b>");
+
+    var content = email_lines.join("\r\n").trim();
+    var base64EncodedEmail = new Buffer(content).toString('base64');
+    base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_')
+    console.log(base64EncodedEmail);
+    gmail.users.messages.send({
+        userId: "thibaut@weassur.com",
+        ressource: {
+            raw: base64EncodedEmail
+        },
+        media: null
     });
 };
 
@@ -79,20 +138,28 @@ var sendMail = function(email) {
             console.log('Message sent: ' + email);
         };
     });
-    var mailFounders = {
-        from: 'thibaut@weassur.com',
-        to: "founders@weassur.com",
-        subject: 'Nouvel inscrit !',
-        //text: text //, // plaintext body
-        html: email
-    };
-    transporter.sendMail(mailFounders, function(error, info) {
-        if (error) {
-            console.log('ERROR mail founders: ' + email);
-            console.log(error);
-        } else {
-            console.log('Message sent to founders : ' + email);
-        };
+    //var mailFounders = {
+    //    from: 'thibaut@weassur.com',
+    //    to: "founders@weassur.com",
+    //    subject: 'Nouvel inscrit !',
+    //    //text: text //, // plaintext body
+    //    html: email
+    //};
+    //transporter.sendMail(mailFounders, function(error, info) {
+    //    if (error) {
+    //        console.log('ERROR mail founders: ' + email);
+    //        console.log(error);
+    //    } else {
+    //        console.log('Message sent to founders : ' + email);
+    //    };
+    //});
+};
+
+var writeMail = function(email) {
+    fs.appendFile(mailsFile, email + "\n", function (err) {
+        if (err) {
+            console.log("unable to write mail ! " + email);
+        }
     });
 };
 
